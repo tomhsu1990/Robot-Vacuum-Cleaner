@@ -10,6 +10,8 @@
 #include <deque>
 #include <unordered_map>
 
+bool animation(false);
+
 class Cleaner{
 public:
 	using Location = std::pair<int, int>;
@@ -26,7 +28,6 @@ public:
 	std::vector<int> parseLocation (std::string s) {
 		std::vector<int> loc;
 		std::string tmp("");
-		//std::cerr << it->first << std::endl;
 		for (unsigned i=0;i<s.size();++i) {
 			if (s[i] == ',') {
 				loc.push_back(atoi(tmp.c_str()));
@@ -53,11 +54,10 @@ public:
 
 	bool Move (bool touchWall) {
 		// for animation visualization
-		//if (touchWall){
-			//std::cout << "move " << glb_pos.first << " " << glb_pos.second << " " << dir << std::endl;
-			//mp[glb_pos.first][glb_pos.second] = '*';
-		//}
-		//showGlobalMap();
+		if (touchWall && animation){
+			mp[glb_pos.first][glb_pos.second] = '*';
+			showGlobalMap();
+		}
 
 		if (dir == N) {
 			if (glb_pos.first-1 < 0 ||
@@ -103,6 +103,12 @@ public:
 	}
 
 	void Move (Location &cur, Location nxt) {
+		//std::cout << "move " << glb_pos.first << " " << glb_pos.second << " " << dir << std::endl;
+		if (animation) {
+			mp[cur.first][cur.second] = '*';
+			showGlobalMap();
+		}
+
 		// determine next position's direction
 		int d;
 		int dx[] = {-1,0,1,0};
@@ -144,11 +150,12 @@ public:
 				if (cleaned.find(p) != cleaned.end() && 
 					visited.find(p) == visited.end()){
 					visited[p] = cur;
-					if (tmp == nxt) {
-						find = true;
-						break;
-					}
 					q.push(tmp);
+				}
+				if (tmp == nxt) {
+					visited[p] = cur;
+					find = true;
+					break;
 				}
 			}
 		}
@@ -161,20 +168,16 @@ public:
 		return route;
 	}
 
-	// do we have to keep a dynamic local map?
+	void recordPose () {
+		if (dir == N) 	   pos.push_back(Cleaner::Location(glb_pos.first+1,glb_pos.second));
+		else if (dir == E) pos.push_back(Cleaner::Location(glb_pos.first,glb_pos.second-1));
+		else if (dir == S) pos.push_back(Cleaner::Location(glb_pos.first-1,glb_pos.second));
+		else if (dir == W) pos.push_back(Cleaner::Location(glb_pos.first,glb_pos.second+1));
+	}
+
+	// Do we have to keep a dynamic local map?
 	void updateLocalMap () {
-		if (dir == N) {
-			pos.push_back(Cleaner::Location(glb_pos.first+1,glb_pos.second));
-		}
-		else if (dir == E) {
-			pos.push_back(Cleaner::Location(glb_pos.first,glb_pos.second-1));
-		}
-		else if (dir == S) {
-			pos.push_back(Cleaner::Location(glb_pos.first-1,glb_pos.second));
-		}
-		else if (dir == W) {
-			pos.push_back(Cleaner::Location(glb_pos.first,glb_pos.second+1));
-		}
+
 	}
 
 	void updateGlobalMap () {
@@ -195,7 +198,7 @@ public:
 			// maintain that left hand touches a wall
 			while (true) {
 				// assume back is not a possible empty place
-				updateLocalMap();
+				recordPose();
 				
 				int turn(0);
 				while (turn < 4) {
@@ -215,27 +218,25 @@ public:
 			// go to a possible un-cleaned position
 			bool find(false);
 			Location nxt;
-			while (true) {
-				if (pos.empty()) break;
-				else {
-					nxt = pos.front(); pos.pop_front();
-					if (nxt.first < 0 || nxt.first >= mp.size() || 
-						nxt.second < 0 || nxt.second >= mp[nxt.first].size() ||
-						mp[nxt.first][nxt.second] == '+')
-						continue;
-					if (cleaned.find(std::to_string(nxt.first)+","+std::to_string(nxt.second)+",") != cleaned.end())
-						continue;
-					find = true;
-					break;
-				}
+			while (!pos.empty()) {
+				nxt = pos.front(); pos.pop_front();
+				if (nxt.first < 0 || nxt.first >= mp.size() || 
+					nxt.second < 0 || nxt.second >= mp[nxt.first].size() ||
+					mp[nxt.first][nxt.second] == '+')
+					continue;
+				if (cleaned.find(std::to_string(nxt.first)+","+std::to_string(nxt.second)+",") != cleaned.end())
+					continue;
+				find = true;
+				break;
 			}
 			if (find) {
 				// move to nxt as the start of the next round
 				// via previous exploring positions
 				std::vector<Location> route = bfs(glb_pos, nxt);
 				if (route.empty()) break;
-				for (int i=route.size()-1;i>=0;--i)
+				for (int i=route.size()-1;i>=0;--i) {
 					Move(glb_pos, route[i]);
+				}
 			}
 		} while (!pos.empty()) ;
 
@@ -243,7 +244,7 @@ public:
 	}
 
 	void showGlobalMap () {
-		//system("clear");
+		if (animation) system("clear");
 
 		char tmp(mp[glb_pos.first][glb_pos.second]);
 		if (dir == N)
@@ -258,7 +259,7 @@ public:
 			std::cout << mp[i] << std::endl;
 		mp[glb_pos.first][glb_pos.second] = tmp;
 
-		//sleep(1);
+		if (animation) sleep(1);
 	}
 
 	void showLocalMap () {
@@ -280,6 +281,8 @@ int main (int argc, char* argv[]) {
 	std::string mapName;
 	if(argc == 1) mapName = "map.txt";
 	else		  mapName = argv[1];
+	if(argc == 3) animation = (bool)atoi(argv[2]);
+
 	std::ifstream myMap(mapName);
 	if (myMap.is_open()) {
 		Cleaner *robot = new Cleaner();
