@@ -110,7 +110,7 @@ public:
 		dir = (dir+k)%4;
 	}
 
-	void updateMap () {
+	void updateLocalMap () {
 		if (dir == N) {
 			pos.push_back(Cleaner::Location(glb_pos.first+1,glb_pos.second));
 		}
@@ -124,11 +124,18 @@ public:
 			pos.push_back(Cleaner::Location(glb_pos.first,glb_pos.second+1));
 		}
 	}
+
+	void updateGlocalMap () {
+		for (auto it=cleaned.begin();it!=cleaned.end();++it) {
+			std::vector<int> loc = parseLocation(it->first);
+			mp[loc[0]][loc[1]] = 'x'; // x means cleaned.
+		}
+	}
 	
 	void clean () {
 		// initialize robot local pose
 		locl_pos = Cleaner::Location(0,0);
-		do {
+		//do {
 			// turn the direction to N
 			while(dir != N) turnRight(1);
 			// move forward and touch a wall
@@ -136,7 +143,7 @@ public:
 			// maintain that left hand touches a wall
 			while (true) {
 				// assume back is not a possible empty place
-				updateMap();
+				updateLocalMap();
 				
 				int turn(0);
 				while (turn < 4) {
@@ -154,27 +161,29 @@ public:
 			}
 
 			// go to a possible un-cleaned position
-			bool find(false);
-			Location nxt;
-			while (true) {
-				if (pos.empty()) break;
-				else {
-					nxt = pos.front(); pos.pop_front();
-					if (nxt.first < 0 || nxt.first >= mp.size() || 
-						nxt.second < 0 || nxt.second >= mp[nxt.first].size() ||
-						mp[nxt.first][nxt.second] == '+')
-						continue;
-					if (cleaned.find(std::to_string(nxt.first)+","+std::to_string(nxt.second)+",") != cleaned.end())
-						continue;
-					find = true;
-					break;
-				}
-			}
-			if (find) {
-				// move to nxt as the start of the next round
+			// bool find(false);
+			// Location nxt;
+			// while (true) {
+			// 	if (pos.empty()) break;
+			// 	else {
+			// 		nxt = pos.front(); pos.pop_front();
+			// 		if (nxt.first < 0 || nxt.first >= mp.size() || 
+			// 			nxt.second < 0 || nxt.second >= mp[nxt.first].size() ||
+			// 			mp[nxt.first][nxt.second] == '+')
+			// 			continue;
+			// 		if (cleaned.find(std::to_string(nxt.first)+","+std::to_string(nxt.second)+",") != cleaned.end())
+			// 			continue;
+			// 		find = true;
+			// 		break;
+			// 	}
+			// }
+			// if (find) {
+			// 	// move to nxt as the start of the next round
 
-			}
-		} while (!pos.empty()) ;
+			// }
+		//} while (!pos.empty()) ;
+
+		updateGlocalMap();
 	}
 
 	void showGlobalMap () {
