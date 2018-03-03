@@ -1,11 +1,10 @@
 # Robot Vacuum Cleaner
 
-Suppose you have a robot vacuum cleaner.
-After placing it on the floor, could it sweep the entire floor without map information?
-In other words, just by touching the wall, could the robot accomplish the task?
+Suppose you have a robot vacuum cleaner. After placing it on the floor, could it sweep the entire floor without map information? In other words, just by touching the wall, could the robot accomplish the task? 
 
 ## How to run: (MacOS)
 g++ -std=c++11 Cleaner.cpp
+
 ./a.out map.txt
 
 I haven't tested in Linux and Windows, but I guess Linux will work fine.
