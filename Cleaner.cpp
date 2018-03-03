@@ -102,6 +102,20 @@ public:
 		return true;
 	}
 
+	void Move (Location &cur, Location nxt) {
+		// determine next position's direction
+		int d;
+		int dx[] = {-1,0,1,0};
+		int dy[] = {0,1,0,-1};
+		for (int i=0;i<4;++i) {
+			Location tmp(cur.first+dx[i], cur.second+dy[i]);
+			if (tmp == nxt) d = i;
+		}
+		while (dir != d)
+			turnRight(1);
+		cur = nxt;
+	}
+
 	void turnLeft (int k) {
 		//k = k%4;
 		dir = (dir-k+4)%4;
@@ -220,9 +234,8 @@ public:
 				// via previous exploring positions
 				std::vector<Location> route = bfs(glb_pos, nxt);
 				if (route.empty()) break;
-				for (int i=route.size()-1;i>=0;--i) {
-					
-				}
+				for (int i=route.size()-1;i>=0;--i)
+					Move(glb_pos, route[i]);
 			}
 		} while (!pos.empty()) ;
 
