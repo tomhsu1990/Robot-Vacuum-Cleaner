@@ -7,4 +7,4 @@ g++ -std=c++11 Cleaner.cpp
 
 ./a.out map.txt
 
-I haven't tested in Linux and Windows, but I guess Linux will work fine.
+I haven't tested in Linux and Windows, but I guess the code will work fine under Linux.
