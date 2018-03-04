@@ -315,6 +315,8 @@ int main (int argc, char* argv[]) {
 
 		robot->clean();
 		robot->showGlobalMap();
+
+		delete robot;
 	}
 	else std::cerr << "Unable to open " << mapName << std::endl;
 
