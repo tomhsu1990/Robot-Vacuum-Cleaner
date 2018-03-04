@@ -277,7 +277,7 @@ public:
 
 	}
 
-	int dir, step, turns;
+	int dir, steps, turns;
 	Location glb_pos, locl_pos;
 	std::vector<std::string> mp; 		// global map
 	std::deque<std::deque<char>> dy_mp; // local map
