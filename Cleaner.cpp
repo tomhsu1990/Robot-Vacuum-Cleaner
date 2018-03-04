@@ -24,6 +24,7 @@ public:
 		mp.clear();
 		pos.clear();
 		cleaned.clear();
+		wall.clear();
 		dir = -1;
 		steps = turns = 0;
 	}
@@ -65,7 +66,8 @@ public:
 
 		if (dir == N) {
 			if (glb_pos.first-1 < 0 ||
-				mp[glb_pos.first-1][glb_pos.second] == '+' ||
+				//mp[glb_pos.first-1][glb_pos.second] == '+' ||
+				wall.find(std::to_string(glb_pos.first-1)+","+std::to_string(glb_pos.second)+",") != wall.end() ||
 				cleaned.find(std::to_string(glb_pos.first-1)+","+std::to_string(glb_pos.second)+",") != cleaned.end() ||
 				!check(glb_pos.first-1, glb_pos.second, dir))
 				return false;
@@ -74,7 +76,8 @@ public:
 		}
 		else if (dir == E) {
 			if (glb_pos.second+1 >= mp[glb_pos.first].size() || 
-				mp[glb_pos.first][glb_pos.second+1] == '+' ||
+				//mp[glb_pos.first][glb_pos.second+1] == '+' ||
+				wall.find(std::to_string(glb_pos.first)+","+std::to_string(glb_pos.second+1)+",") != wall.end() ||
 				cleaned.find(std::to_string(glb_pos.first)+","+std::to_string(glb_pos.second+1)+",") != cleaned.end() ||
 				!check(glb_pos.first, glb_pos.second+1, dir))
 				return false;
@@ -84,7 +87,8 @@ public:
 		else if (dir == S) {
 			if (glb_pos.first+1 >= mp.size() || 
 			    glb_pos.second >= mp[glb_pos.first+1].size() ||
-				mp[glb_pos.first+1][glb_pos.second] == '+' ||
+				//mp[glb_pos.first+1][glb_pos.second] == '+' ||
+				wall.find(std::to_string(glb_pos.first+1)+","+std::to_string(glb_pos.second)+",") != wall.end() ||
 				cleaned.find(std::to_string(glb_pos.first+1)+","+std::to_string(glb_pos.second)+",") != cleaned.end() ||
 				!check(glb_pos.first+1, glb_pos.second, dir))
 				return false;
@@ -93,7 +97,8 @@ public:
 		}
 		else if (dir == W) {
 			if (glb_pos.second-1 < 0 || 
-				mp[glb_pos.first][glb_pos.second-1] == '+' ||
+				//mp[glb_pos.first][glb_pos.second-1] == '+' ||
+				wall.find(std::to_string(glb_pos.first)+","+std::to_string(glb_pos.second-1)+",") != wall.end() ||
 				cleaned.find(std::to_string(glb_pos.first)+","+std::to_string(glb_pos.second-1)+",") != cleaned.end() ||
 				!check(glb_pos.first, glb_pos.second-1, dir))
 				return false;
@@ -176,11 +181,23 @@ public:
 		return route;
 	}
 
-	void recordPose () {
-		if (dir == N) 	   pos.push_back(Location(glb_pos.first+1,glb_pos.second));
-		else if (dir == E) pos.push_back(Location(glb_pos.first,glb_pos.second-1));
-		else if (dir == S) pos.push_back(Location(glb_pos.first-1,glb_pos.second));
-		else if (dir == W) pos.push_back(Location(glb_pos.first,glb_pos.second+1));
+	void recordPoseWall () {
+		if (dir == N) {
+			pos.push_back(Location(glb_pos.first+1,glb_pos.second));
+			++wall[std::to_string(glb_pos.first-1)+","+std::to_string(glb_pos.second)+","];
+		}
+		else if (dir == E) {
+			pos.push_back(Location(glb_pos.first,glb_pos.second-1));
+			++wall[std::to_string(glb_pos.first)+","+std::to_string(glb_pos.second+1)+","];
+		}
+		else if (dir == S) {
+			pos.push_back(Location(glb_pos.first-1,glb_pos.second));
+			++wall[std::to_string(glb_pos.first+1)+","+std::to_string(glb_pos.second)+","];
+		}
+		else if (dir == W) {
+			pos.push_back(Location(glb_pos.first,glb_pos.second+1));
+			++wall[std::to_string(glb_pos.first)+","+std::to_string(glb_pos.second-1)+","];
+		}
 	}
 
 	// Do we have to keep a dynamic local map?
@@ -206,7 +223,7 @@ public:
 			// maintain that left hand touches a wall
 			while (true) {
 				// assume back is not a possible empty place
-				recordPose();
+				recordPoseWall();
 				
 				int turn(0);
 				while (turn < 4) {
@@ -233,7 +250,8 @@ public:
 				nxt = pos.front(); pos.pop_front();
 				if (nxt.first < 0 || nxt.first >= mp.size() || 
 					nxt.second < 0 || nxt.second >= mp[nxt.first].size() ||
-					mp[nxt.first][nxt.second] == '+')
+					//mp[nxt.first][nxt.second] == '+')
+					wall.find(std::to_string(nxt.first)+","+std::to_string(nxt.second)+",") != wall.end())
 					// Here, should not check the global map directly
 					// since the robot does not have the global map!
 					// It should use its local map and then traverse to the target to see whether it is a wall or not.
@@ -286,6 +304,7 @@ public:
 	std::deque<std::deque<char>> dy_mp; // local map
 	std::unordered_map<std::string, int> vis;
 	std::unordered_map<std::string, int> cleaned;
+	std::unordered_map<std::string, int> wall;
 	// check whether it is visted
 	std::deque<Location> pos;
 };
@@ -304,28 +323,33 @@ int main (int argc, char* argv[]) {
 		robot = new Cleaner();
 		robot->glb_pos = Cleaner::Location(0,0);
 
+		int x(0);
 		std::string line;
 		while (getline(myMap, line)) {
 			robot->mp.push_back(line);
-			for(int i=0;i<line.size();++i){
-				if(line[i] == '^'){
+			for (int i=0;i<line.size();++i) {
+				if (line[i] == '^') {
 					robot->glb_pos.second = i;
 					robot->dir = Cleaner::N;
 				}
-				else if(line[i] == '>'){
+				else if (line[i] == '>') {
 					robot->glb_pos.second = i;
 					robot->dir = Cleaner::E;
 				}
-				else if(line[i] == 'v'){
+				else if (line[i] == 'v') {
 					robot->glb_pos.second = i;
 					robot->dir = Cleaner::S;
 				}
-				else if(line[i] == '<'){
+				else if (line[i] == '<') {
 					robot->glb_pos.second = i;
 					robot->dir = Cleaner::W;
 				}
+				else if (line[i] == '+') {
+					++robot->wall[std::to_string(x)+","+std::to_string(i)+","];
+				}
 			}
-			if(robot->dir < 0) ++robot->glb_pos.first;
+			if (robot->dir < 0) ++robot->glb_pos.first;
+			++x;
 		}
 		myMap.close();
 
