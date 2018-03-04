@@ -234,6 +234,9 @@ public:
 				if (nxt.first < 0 || nxt.first >= mp.size() || 
 					nxt.second < 0 || nxt.second >= mp[nxt.first].size() ||
 					mp[nxt.first][nxt.second] == '+')
+					// Here, should not check the global map directly
+					// since the robot does not have the global map!
+					// It should use its local map and then traverse to the target to see whether it is a wall or not.
 					continue;
 				if (cleaned.find(std::to_string(nxt.first)+","+std::to_string(nxt.second)+",") != cleaned.end())
 					continue;
@@ -279,7 +282,7 @@ public:
 
 	int dir, steps, turns;
 	Location glb_pos, locl_pos;
-	std::vector<std::string> mp; 		// global map
+	std::vector<std::string> mp; // global map
 	std::deque<std::deque<char>> dy_mp; // local map
 	std::unordered_map<std::string, int> vis;
 	std::unordered_map<std::string, int> cleaned;
