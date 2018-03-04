@@ -58,7 +58,7 @@ public:
 	}
 
 	bool Move (bool touchWall) {
-		// for animation visualization
+		// the update of mp is just for animation visualization
 		if (animation){
 			mp[glb_pos.first][glb_pos.second] = '*';
 			showGlobalMap();
@@ -113,7 +113,7 @@ public:
 	}
 
 	void Move (Location &cur, Location nxt) {
-		//std::cout << "move " << glb_pos.first << " " << glb_pos.second << " " << dir << std::endl;
+		// the update of mp is just for animation visualization
 		if (animation) {
 			mp[cur.first][cur.second] = '*';
 			showGlobalMap();
@@ -206,6 +206,7 @@ public:
 	}
 
 	void updateGlobalMap () {
+		// the update of mp is just for animation visualization
 		for (auto it=cleaned.begin();it!=cleaned.end();++it) {
 			std::vector<int> loc = parseLocation(it->first);
 			mp[loc[0]][loc[1]] = 'x'; // x means cleaned.
