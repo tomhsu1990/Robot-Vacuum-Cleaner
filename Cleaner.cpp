@@ -9,8 +9,11 @@
 #include <queue>
 #include <deque>
 #include <unordered_map>
+#include <algorithm>
 
 bool animation(false);
+
+bool myCmp (std::pair<int, int> a, std::pair<int, int> b);
 
 class Cleaner{
 public:
@@ -22,6 +25,7 @@ public:
 		pos.clear();
 		cleaned.clear();
 		dir = -1;
+		steps = turns = 0;
 	}
 	~Cleaner(){}
 
@@ -54,7 +58,7 @@ public:
 
 	bool Move (bool touchWall) {
 		// for animation visualization
-		if (touchWall && animation){
+		if (animation){
 			mp[glb_pos.first][glb_pos.second] = '*';
 			showGlobalMap();
 		}
@@ -99,6 +103,7 @@ public:
 		std::string rec(std::to_string(glb_pos.first)+","+std::to_string(glb_pos.second)+","+std::to_string(dir));
 		if (touchWall) ++vis[rec];
 
+		++steps;
 		return true;
 	}
 
@@ -120,14 +125,17 @@ public:
 		while (dir != d)
 			turnRight(1);
 		cur = nxt;
+		++steps;
 	}
 
 	void turnLeft (int k) {
 		//k = k%4;
+		++turns;
 		dir = (dir-k+4)%4;
 	}
 	void turnRight (int k) {
 		//k = k%4;
+		++turns;
 		dir = (dir+k)%4;
 	}
 
@@ -169,10 +177,10 @@ public:
 	}
 
 	void recordPose () {
-		if (dir == N) 	   pos.push_back(Cleaner::Location(glb_pos.first+1,glb_pos.second));
-		else if (dir == E) pos.push_back(Cleaner::Location(glb_pos.first,glb_pos.second-1));
-		else if (dir == S) pos.push_back(Cleaner::Location(glb_pos.first-1,glb_pos.second));
-		else if (dir == W) pos.push_back(Cleaner::Location(glb_pos.first,glb_pos.second+1));
+		if (dir == N) 	   pos.push_back(Location(glb_pos.first+1,glb_pos.second));
+		else if (dir == E) pos.push_back(Location(glb_pos.first,glb_pos.second-1));
+		else if (dir == S) pos.push_back(Location(glb_pos.first-1,glb_pos.second));
+		else if (dir == W) pos.push_back(Location(glb_pos.first,glb_pos.second+1));
 	}
 
 	// Do we have to keep a dynamic local map?
@@ -189,7 +197,7 @@ public:
 	
 	void clean () {
 		// initialize robot local pose
-		locl_pos = Cleaner::Location(0,0);
+		locl_pos = Location(0,0);
 		do {
 			// turn the direction to N
 			while(dir != N) turnRight(1);
@@ -215,7 +223,10 @@ public:
 				} while(Move(true)) ;
 			}
 
+			std::sort(pos.begin(), pos.end(), myCmp);
+
 			// go to a possible un-cleaned position
+			// this part can be improved by planning to go to the nearest one
 			bool find(false);
 			Location nxt;
 			while (!pos.empty()) {
@@ -259,14 +270,14 @@ public:
 			std::cout << mp[i] << std::endl;
 		mp[glb_pos.first][glb_pos.second] = tmp;
 
-		if (animation) sleep(1);
+		if (animation) usleep(200000);
 	}
 
 	void showLocalMap () {
 
 	}
 
-	int dir;
+	int dir, step, turns;
 	Location glb_pos, locl_pos;
 	std::vector<std::string> mp; 		// global map
 	std::deque<std::deque<char>> dy_mp; // local map
@@ -276,16 +287,18 @@ public:
 	std::deque<Location> pos;
 };
 
+Cleaner *robot;
+
 int main (int argc, char* argv[]) {
 	
 	std::string mapName;
-	if(argc == 1) mapName = "map.txt";
+	if(argc == 1) mapName = "./map/map.txt";
 	else		  mapName = argv[1];
 	if(argc == 3) animation = (bool)atoi(argv[2]);
 
 	std::ifstream myMap(mapName);
 	if (myMap.is_open()) {
-		Cleaner *robot = new Cleaner();
+		robot = new Cleaner();
 		robot->glb_pos = Cleaner::Location(0,0);
 
 		std::string line;
@@ -313,12 +326,26 @@ int main (int argc, char* argv[]) {
 		}
 		myMap.close();
 
+		if (animation) {
+			robot->showGlobalMap();
+			getchar();
+		}
+
 		robot->clean();
 		robot->showGlobalMap();
+
+		std::cout << "number of steps: " << robot->steps << std::endl;
+		std::cout << "number of turn: " << robot->turns << std::endl;
 
 		delete robot;
 	}
 	else std::cerr << "Unable to open " << mapName << std::endl;
 
 	return 0;
+}
+
+bool myCmp (std::pair<int, int> a, std::pair<int, int> b) {
+	int dist_a(abs(a.first-robot->glb_pos.first)+abs(a.second-robot->glb_pos.second));
+	int dist_b(abs(b.first-robot->glb_pos.first)+abs(b.second-robot->glb_pos.second));
+	return dist_a < dist_b;
 }
