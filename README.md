@@ -51,7 +51,7 @@ I haven't tested in Linux and Windows, but I guess the code will work fine under
 ## Question
 1. If we accidentally replace the robot to other position, how do we deal with this situation?
 
-Initialize the cleaning process
+    Initialize the cleaning process
 
 2. Could we extend the algorithm to 3D environment?
 
@@ -59,7 +59,7 @@ Initialize the cleaning process
 
 4. If the map has no boundary, how do we handle this problem?
 
-Set a virtual boundary.
+    Set a virtual boundary.
 
 5. What about there are moving obstacles in the environment?
 
