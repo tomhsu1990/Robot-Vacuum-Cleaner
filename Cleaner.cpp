@@ -314,19 +314,19 @@ Cleaner *robot;
 
 int main (int argc, char* argv[]) {
 	
-	std::string mapName;
-	if(argc == 1) mapName = "./map/map.txt";
-	else		  mapName = argv[1];
+	std::string map_name;
+	if(argc == 1) map_name = "./map/map.txt";
+	else		  map_name = argv[1];
 	if(argc == 3) animation = (bool)atoi(argv[2]);
 
-	std::ifstream myMap(mapName);
-	if (myMap.is_open()) {
+	std::ifstream my_map(map_name);
+	if (my_map.is_open()) {
 		robot = new Cleaner();
 		robot->glb_pos = Cleaner::Location(0,0);
 
 		int x(0);
 		std::string line;
-		while (getline(myMap, line)) {
+		while (getline(my_map, line)) {
 			robot->mp.push_back(line);
 			for (int i=0;i<line.size();++i) {
 				if (line[i] == '^') {
@@ -352,7 +352,7 @@ int main (int argc, char* argv[]) {
 			if (robot->dir < 0) ++robot->glb_pos.first;
 			++x;
 		}
-		myMap.close();
+		my_map.close();
 
 		if (animation) {
 			robot->showGlobalMap();
@@ -367,7 +367,7 @@ int main (int argc, char* argv[]) {
 
 		delete robot;
 	}
-	else std::cerr << "Unable to open " << mapName << std::endl;
+	else std::cerr << "Unable to open " << map_name << std::endl;
 
 	return 0;
 }
