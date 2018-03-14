@@ -5,7 +5,7 @@ Suppose you have a robot vacuum cleaner. After placing it on the floor, could it
 Here is the simulation video: [Robot Vacuum Cleaner Simulation](https://youtu.be/AFBVZCKAXzI)
 
 ## Idea
-The idea is simple. Just view the problem as solving a maze problem. We have to maintain going along with the wall and that left hand touches the wall. After sweeping a position, treat the position as a kind of virtual wall for termination condition.
+The idea is simple. Just view the problem as solving a maze problem. We have to maintain going along with the wall and that left hand touches the wall. Meanwhile, we assume our right hand touches nothing. After sweeping a position, treat the position as a kind of virtual wall for termination condition.
 
 ## Algorithm
 1. Turn the direction to head to North.
@@ -33,7 +33,7 @@ The idea is simple. Just view the problem as solving a maze problem. We have to 
 * When it is a valid Move, we will record the position as a cleaned position.
 
 ## Discussion
-The behavior would look like circling the environment and the circle becomes smaller and smaller. However, it might produces several isolated circles. This way, we perform step 3-6 to visit each possible isolated circles.
+The behavior would look like circling the environment and the circle becomes smaller and smaller. However, it might produces several isolated sub-environment. This way, we perform step 3-6 to visit each possible isolated circles.
 
 There is a trivial way to accomplish this task by dfs with backtracking. However, it might use more steps and turns!
 
