@@ -315,9 +315,9 @@ Cleaner *robot;
 int main (int argc, char* argv[]) {
 	
 	std::string map_name;
-	if(argc == 1) map_name = "./map/map.txt";
-	else		  map_name = argv[1];
-	if(argc == 3) animation = (bool)atoi(argv[2]);
+	if (argc == 1) map_name = "./map/map.txt";
+	else		   map_name = argv[1];
+	if (argc == 3) animation = (bool)atoi(argv[2]);
 
 	std::ifstream my_map(map_name);
 	if (my_map.is_open()) {
