@@ -51,9 +51,11 @@ I haven't tested in Linux and Windows, but I guess the code will work fine under
 ## Question
 1. If we accidentally replace the robot to other position, how do we deal with this situation?
 
-    Initialize the cleaning process
+    Initialize the cleaning process.
 
 2. Could we extend the algorithm to 3D environment?
+
+    We could view this problem as a multi-layered original problem. When a position is cleaned, record its top position as next level's     dirty place. This way, after this floor is cleaned entirely, we can use the cleaned position of current floor and move toward next       level's dirty position.
 
 3. Suppose we have multiple robots. How can we modify the algorithm?
 
