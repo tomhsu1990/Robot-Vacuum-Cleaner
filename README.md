@@ -30,7 +30,7 @@ The idea is simple. Just view the problem as solving a maze problem. We have to 
 
 6. If we can find a valid position, do a bfs to move current position to the valid position pos. The movements are on the recorded cleaned positions. Then, go to the first step.
 
-* When it is a valid Move, we will record the position as a cleaned.
+* When it is a valid Move, we will record the position as a cleaned position.
 
 ## Discussion
 The behavior would look like circling the environment and the circle becomes smaller and smaller. However, it might produces several isolated circles. This way, we perform step 3-6 to visit each possible isolated circles.
