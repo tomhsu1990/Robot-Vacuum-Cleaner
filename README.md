@@ -66,3 +66,5 @@ I haven't tested in Linux and Windows, but I guess the code will work fine under
 5. What about there are moving obstacles in the environment?
 
 6. What about there are "movable" obstacles in the environment?
+    
+    Since we only uses vacuum cleaner's bumper to accomplish the task, we cannot deal with movable obstacles after they are moved by the     cleaner. The algorithm will treat the movable obstacles as empty spaces while moving the obstacles. Once, the cleaner cannot move       the obstacle, the obstacle will be considered as a stuck space.
