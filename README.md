@@ -37,7 +37,7 @@ The behavior would look like circling the environment and the circle becomes sma
 
 There is a trivial way to accomplish this task by dfs with backtracking. However, it might use more steps and turns!
 
-## How to run: (MacOS)
+## How to run (MacOS)
 g++ -std=c++11 Cleaner.cpp
 
 ./a.out ./map/map.txt
