@@ -2,7 +2,7 @@
 
 Suppose you have a robot vacuum cleaner. After placing it on the floor, could it sweep the entire floor without map information? In other words, just by bumping the wall, could the robot accomplish the task?
 
-Here is the simulation video: [Robot Vacuum Cleaner Simulation](https://youtu.be/AFBVZCKAXzI)
+Here is my demonstration video: [Robot Vacuum Cleaner Simulation](https://youtu.be/AFBVZCKAXzI)
 
 ## Idea
 The idea is simple. Just view the problem as solving a maze problem. We have to maintain going along with the wall and that left hand touches the wall. Meanwhile, we assume our right hand touches nothing. After sweeping a position, treat the position as a kind of virtual wall for termination condition.
